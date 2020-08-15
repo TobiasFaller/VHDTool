@@ -11,7 +11,7 @@ namespace VHDTool {
 
 	OperationName::OperationName() : name(), description(), operation(), options(), valid(false) {}
 	OperationName::OperationName(const char* name, const char* description, const Operation operation,
-		const vector<const OptionName> options) : name(name), description(description), operation(operation),
+		const vector<OptionName> options) : name(name), description(description), operation(operation),
 		options(options), valid(true) {}
 
 	OperationName& OperationName::operator= (const OperationName& other) {
@@ -38,10 +38,10 @@ namespace VHDTool {
 	const Operation OperationName::getOperationValue() {
 		return operation;
 	}
-	const vector<const OptionName>::const_iterator OperationName::begin() {
+	const vector<OptionName>::const_iterator OperationName::begin() {
 		return options.cbegin();
 	}
-	const vector<const OptionName>::const_iterator OperationName::end() {
+	const vector<OptionName>::const_iterator OperationName::end() {
 		return options.cend();
 	}
 

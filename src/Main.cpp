@@ -7,7 +7,7 @@ using namespace std;
 
 namespace VHDTool {
 
-	int main(size_t argc, const vector<const string> argv);
+	int main(size_t argc, const vector<string> argv);
 	void PrintUsage(const string path);
 
 	void DoActionOnSingleFile(const string path, const size_t operation, const FileOptions arguments);
@@ -33,7 +33,7 @@ namespace VHDTool {
 		}
 	}
 
-	int main(size_t argc, const vector<const string> argv)
+	int main(size_t argc, const vector<string> argv)
 	{
 		cout << "VHDTool v1.0" << endl;
 		cout << endl;
@@ -314,7 +314,7 @@ namespace VHDTool {
 }
 
 int main(const int argc, const char* argv[]) {
-	vector<const string> parsedParams = vector<const string>();
+	vector<string> parsedParams = vector<string>();
 
 	for (int arg = 0; arg < argc; arg++) {
 		parsedParams.push_back(string(argv[arg]));

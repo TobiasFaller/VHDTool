@@ -87,12 +87,12 @@ namespace VHDTool {
 		string name;
 		string description;
 		Operation operation;
-		vector<const OptionName> options;
+		vector<OptionName> options;
 
 	public:
 		OperationName();
 		OperationName(const char* name, const char* description,
-			Operation operation, const vector<const OptionName> options);
+			Operation operation, const vector<OptionName> options);
 
 		OperationName& operator= (const OperationName& other);
 
@@ -100,8 +100,8 @@ namespace VHDTool {
 		const string getName();
 		const string getDescription();
 		const Operation getOperationValue();
-		const vector<const OptionName>::const_iterator begin();
-		const vector<const OptionName>::const_iterator end();
+		const vector<OptionName>::const_iterator begin();
+		const vector<OptionName>::const_iterator end();
 	};
 
 	// Constants
@@ -109,7 +109,7 @@ namespace VHDTool {
 	const string EXTENSION_UNDEFINED = string("Undefined");
 	const string EXTENSION_VHD = string("VHD");
 	const string EXTENSION_VHDX = string("VHDX");
-	const vector<const string> EXTENSIONS = {EXTENSION_VHD, EXTENSION_VHDX};
+	const vector<string> EXTENSIONS = {EXTENSION_VHD, EXTENSION_VHDX};
 
 	const string SEARCH_APPEND = string("*");
 
@@ -133,14 +133,14 @@ namespace VHDTool {
 		Option::DirectoryRecursive, true
 	);
 
-	const vector<const OptionName> MOUNT_OPTIONS = {
+	const vector<OptionName> MOUNT_OPTIONS = {
 		OPTION_DIRECTORY,
 		OPTION_DIRECTORY_RECURSIVE,
 		OPTION_TRYALL,
 		OPTION_READONLY
 	};
 
-	const vector<const OptionName> DISMOUNT_OPTIONS = {
+	const vector<OptionName> DISMOUNT_OPTIONS = {
 		OPTION_DIRECTORY,
 		OPTION_DIRECTORY_RECURSIVE,
 		OPTION_TRYALL
@@ -148,8 +148,7 @@ namespace VHDTool {
 
 	const OperationName OPERATION_HELP = OperationName(
 		"help", "Prints this help text",
-		Operation::Help,
-		vector<const OptionName>()
+		Operation::Help, vector<OptionName>()
 	);
 	const OperationName OPERATION_MOUNT = OperationName(
 		"mount", "Mounts a specified file / files in a directory",
@@ -160,7 +159,7 @@ namespace VHDTool {
 		Operation::Dismount, DISMOUNT_OPTIONS
 	);
 
-	const vector<const OperationName> OPERATION_NAMES = {
+	const vector<OperationName> OPERATION_NAMES = {
 		OPERATION_HELP,
 		OPERATION_MOUNT,
 		OPERATION_DISMOUNT
