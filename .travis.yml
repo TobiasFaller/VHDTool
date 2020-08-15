@@ -6,8 +6,7 @@ jobs:
     env:
     - MINGW64_PATH="/C/tools/msys64/mingw64/bin"
     script:
-    - export PATH=$MINGW64_PATH:$PATH
-    - $msys2 mingw32-make all
+    - $msys2 export PATH=$MINGW64_PATH:$PATH && mingw32-make all
 
 before_install:
 - |-
