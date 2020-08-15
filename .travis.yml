@@ -53,4 +53,5 @@ deploy:
   file: VHDTool.exe
   on:
     repo: TobiasFaller/VHDTool
+    tags: true
   skip_cleanup: 'true'
