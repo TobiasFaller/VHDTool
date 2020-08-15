@@ -50,7 +50,10 @@ deploy:
   provider: releases
   api_key:
     secure: WGLscN0wLYl9N1fjn7TgX6cmIFk5cLjcsJFH/YDVfbyiBqE3ch07knW4V7gkd2iuWh2+0P3FUQmlvUVmW+X7oaPZN1HINiAnHSZqGvBG0M6lmFgJK773zHmL4BB/TGSD2l4C8RKu3a1/RIG9NQwF3t1bfD6T72qvAsV0gcYmmEFscS8bCVrlloow11mJVnrYHoJxbrztItYh67adYdg3qoGJE1gLc1omkbXhNBMrLBMLXYk5nuKVfGQd8FnY0nTzTXhpIg4UbnIjNIXvUx0Hc9ljn+1v/7X1OcnERRThQ30hjY0qs15GHgexMuz38ck3PKTgUbGyzbL1laj+0qIywn1i5o2tE2bpuTNv0kF9R6u5mtp+N0HHYD630mK7GXFos2115W7mPz0Uzb6wE2I170s3tdqyZ+Iq/pIUWhyDn9y8gvp2Q4QpTNA3+OLYon16AH66R+jDUG0+OVLEam3IYs0CnACREDpVIzIBhvOGIdgEKLF+4uLz2XdPPKod+SqUlo85Bd56TeO2vvLsZsKvPeRehsj5+18JYQlJShYGHxKWc8B3tQGL2n9oJXvRGuYsGRjtczmkSLoym3wVOcPBIE84jPcBQvfbGg0SZGSdT26olo7B2CTojfHJQgPXI2p3DGqWmE9p6JK3qumfOWVSnjAUx0/tzQnMlQLCxJQ6pUM=
-  file: VHDTool.exe
+  file:
+  - VHDTool.exe
+  - install_context_menu.bat
+  - uninstall_context_menu.bat
   on:
     repo: TobiasFaller/VHDTool
     tags: true
