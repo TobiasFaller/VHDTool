@@ -59,12 +59,12 @@ namespace VHDTool {
 			//wstring_convert<codecvt_utf8<wchar_t>> utf8conv;
 			//string data = utf8conv.to_bytes(wstring((wchar_t*)errorText));
 			//string message = boost::locale::conv::from_utf((wchar_t*)errorText, locale());
-			cout << "Error " << ((const void*)error) << ": " << message << endl;
+			cout << "Error " << boost::format("0x%08x") % error << ": " << message << endl;
 
 			LocalFree(errorText);
 		}
 		else {
-			cout << "Error: " << ((const void*)error) << endl;
+			cout << "Error: " << boost::format("0x%08x") % error << endl;
 		}
 	}
 
