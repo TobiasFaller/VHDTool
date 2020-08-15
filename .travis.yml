@@ -4,8 +4,10 @@ jobs:
   include:
   - os: windows
     env:
-    - GCC=""
-    script: $msys2 mingw32-make all
+    - MINGW64_PATH="/C/tools/msys64/mingw64/bin"
+    script:
+    - export PATH=$MINGW64_PATH:$PATH
+    - $msys2 mingw32-make all
 
 before_install:
 - |-

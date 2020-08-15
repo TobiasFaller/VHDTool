@@ -7,12 +7,11 @@
 SOURCES = $(wildcard src/*.cpp)
 HEADER = $(wildcard src/*.h)
 
-GPP := g++
-
-CPPFLAGS := -iquote src -Wall -g -std=c++11
+CXX := g++
+CXXFLAGS := -iquote src -Wall -g -std=c++11
 LDFLAGS := -static -static-libgcc -static-libstdc++ -lVirtDisk -luuid
 
 all: build
 
 build: $(SOURCES)
-	$(GPP) $(CPPFLAGS) $^ $(LDFLAGS) -o VHDTool.exe
+	$(CXX) $(CXXFLAGS) $^ $(LDFLAGS) -o VHDTool.exe
