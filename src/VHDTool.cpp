@@ -25,7 +25,7 @@ namespace VHDTool {
 	Operation OperationName::getOperationValue(void) const {
 		return operation;
 	}
-	const initializer_list<const OptionName>& OperationName::getOptions(void) const {
+	const initializer_list<const OptionName> OperationName::getOptions(void) const {
 		return options;
 	}
 
@@ -128,50 +128,52 @@ namespace VHDTool {
 		Option::DirectoryRecursive, true
 	);
 
+	const initializer_list<const OptionName> OPTIONS_HELP = {};
 	const OperationName OPERATION_HELP = OperationName(
 		"help", "Prints this help text",
 		Operation::Help,
-		{}
+		OPTIONS_HELP
 	);
+	const initializer_list<const OptionName> OPTIONS_MOUNT = {
+		OPTION_DIRECTORY,
+		OPTION_DIRECTORY_RECURSIVE,
+		OPTION_TRYALL,
+		OPTION_READONLY
+	};
 	const OperationName OPERATION_MOUNT = OperationName(
 		"mount", "Mounts a specified file / files in a directory",
 		Operation::Mount,
-		{
-			OPTION_DIRECTORY,
-			OPTION_DIRECTORY_RECURSIVE,
-			OPTION_TRYALL,
-			OPTION_READONLY
-		}
+		OPTIONS_MOUNT
 	);
+	const initializer_list<const OptionName> OPTIONS_DISMOUNT = {
+		OPTION_DIRECTORY,
+		OPTION_DIRECTORY_RECURSIVE,
+		OPTION_TRYALL
+	};
 	const OperationName OPERATION_DISMOUNT = OperationName(
 		"unmount", "Dismounts a specified file / files in a directory",
 		Operation::Dismount,
-		{
-			OPTION_DIRECTORY,
-			OPTION_DIRECTORY_RECURSIVE,
-			OPTION_TRYALL
-		}
+		OPTIONS_DISMOUNT
 	);
 
-	const std::initializer_list<const OperationName> OPERATION_NAMES = {
+	const initializer_list<const OperationName> OPERATIONS = {
 		OPERATION_HELP,
 		OPERATION_MOUNT,
 		OPERATION_DISMOUNT
 	};
-	const std::initializer_list<const OperationName>& getSupportedOperations(void) {
-		return OPERATION_NAMES;
+	const initializer_list<const OperationName> getSupportedOperations(void) {
+		return OPERATIONS;
 	}
 
 	// Supported extensions
 
-	const std::initializer_list<const std::string> EXTENSIONS = {
+	const initializer_list<const string> EXTENSIONS = {
 		EXTENSION_VHD,
 		EXTENSION_VHDX,
 		EXTENSION_ISO
 	};
-	const std::initializer_list<const std::string>& getSupportedExtensions(void) {
+	const std::initializer_list<const std::string> getSupportedExtensions(void) {
 		return EXTENSIONS;
 	}
-
 
 };

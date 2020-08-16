@@ -39,7 +39,7 @@ namespace VHDTool {
 		const std::string getName(void) const;
 		const std::string getDescription(void) const;
 		Operation getOperationValue(void) const;
-		const std::initializer_list<const OptionName>& getOptions(void) const;
+		const std::initializer_list<const OptionName> getOptions(void) const;
 	};
 
 	class OptionName {
@@ -92,8 +92,8 @@ namespace VHDTool {
 		FileOptions& getFileOptions(void);
 	};
 
-	const std::initializer_list<const OperationName>& getSupportedOperations(void);
-	const std::initializer_list<const std::string>& getSupportedExtensions(void);
+	const std::initializer_list<const OperationName> getSupportedOperations(void);
+	const std::initializer_list<const std::string> getSupportedExtensions(void);
 
 	// Constants
 
