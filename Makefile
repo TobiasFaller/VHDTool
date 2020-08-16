@@ -20,5 +20,5 @@ all: build
 
 build: $(SOURCES)
 	$(WINDRES) $(WINDRESFLAGS) src/vhdtool.rc src/vhdtool.rc.o
-	$(CXX) $(CXXFLAGS) src/vhdtool.rc.o $^ $(LDFLAGS) -o VHDTool.exe
-	$(STRIP) $(STRIPFLAGS) VHDTool.exe
+	$(CXX) $(CXXFLAGS) src/vhdtool.rc.o $^ $(LDFLAGS) -o VHDTool_Debug.exe
+	$(STRIP) $(STRIPFLAGS) -o VHDTool.exe VHDTool_Debug.exe
