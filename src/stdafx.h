@@ -9,8 +9,10 @@
 #include <initializer_list>
 #include <iostream>
 #include <string>
+#include <type_traits>
 #include <vector>
 #include <codecvt>
+#include <cstdlib>
 
 #include <boost\system\windows_error.hpp>
 #include <boost\algorithm\string.hpp>
@@ -20,8 +22,12 @@
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 
+#ifdef _MSC_VER
 #pragma comment(lib,"uuid.lib")
+#endif
 #include <initguid.h>
 
+#ifdef _MSC_VER
 #pragma comment(lib, "VirtDisk.lib")
+#endif
 #include <virtdisk.h>

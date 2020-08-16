@@ -9,7 +9,7 @@ namespace VHDTool {
 
 	// OperationName
 	OperationName::OperationName(const string name, const string description, Operation operation,
-			const initializer_list<OptionName> options):
+			const initializer_list<const OptionName> options):
 		name(name),
 		description(description),
 		operation(operation),
@@ -25,7 +25,7 @@ namespace VHDTool {
 	Operation OperationName::getOperationValue(void) const {
 		return operation;
 	}
-	const vector<OptionName>& OperationName::getOptions(void) const {
+	const initializer_list<const OptionName>& OperationName::getOptions(void) const {
 		return options;
 	}
 
@@ -78,7 +78,11 @@ namespace VHDTool {
 		return extension;
 	}
 	void FileOptions::setExtension(const string extension) {
-		this->extension = extension;
+		if (!extension.empty()) {
+			this->extension = extension;
+		} else {
+			this->extension = EXTENSION_UNDEFINED;
+		}
 	}
 
 	// ProgramOptions
@@ -104,4 +108,70 @@ namespace VHDTool {
 	FileOptions& ProgramOptions::getFileOptions() {
 		return fileOptions;
 	}
+
+	// Supported options
+
+	const OptionName OPTION_TRYALL = OptionName(
+		"all", "a", "Mount also files with other extension than \"vhd\" or \"vhdx\"",
+		Option::TryAll, false
+	);
+	const OptionName OPTION_READONLY = OptionName(
+		"readonly", "r", "Mounts the file in read-only mode",
+		Option::ReadOnly, false
+	);
+	const OptionName OPTION_DIRECTORY = OptionName(
+		"directory", "d", "Applies the operation to all files in the specified directory/ies.",
+		Option::Directory, true
+	);
+	const OptionName OPTION_DIRECTORY_RECURSIVE = OptionName(
+		"Directory", "D", "Applies the operation to all files in the specified directory/ies and sub-directories.",
+		Option::DirectoryRecursive, true
+	);
+
+	const OperationName OPERATION_HELP = OperationName(
+		"help", "Prints this help text",
+		Operation::Help,
+		{}
+	);
+	const OperationName OPERATION_MOUNT = OperationName(
+		"mount", "Mounts a specified file / files in a directory",
+		Operation::Mount,
+		{
+			OPTION_DIRECTORY,
+			OPTION_DIRECTORY_RECURSIVE,
+			OPTION_TRYALL,
+			OPTION_READONLY
+		}
+	);
+	const OperationName OPERATION_DISMOUNT = OperationName(
+		"unmount", "Dismounts a specified file / files in a directory",
+		Operation::Dismount,
+		{
+			OPTION_DIRECTORY,
+			OPTION_DIRECTORY_RECURSIVE,
+			OPTION_TRYALL
+		}
+	);
+
+	const std::initializer_list<const OperationName> OPERATION_NAMES = {
+		OPERATION_HELP,
+		OPERATION_MOUNT,
+		OPERATION_DISMOUNT
+	};
+	const std::initializer_list<const OperationName>& getSupportedOperations(void) {
+		return OPERATION_NAMES;
+	}
+
+	// Supported extensions
+
+	const std::initializer_list<const std::string> EXTENSIONS = {
+		EXTENSION_VHD,
+		EXTENSION_VHDX,
+		EXTENSION_ISO
+	};
+	const std::initializer_list<const std::string>& getSupportedExtensions(void) {
+		return EXTENSIONS;
+	}
+
+
 };

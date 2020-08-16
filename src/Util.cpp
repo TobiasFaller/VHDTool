@@ -14,7 +14,7 @@ namespace VHDTool {
 		return boost::algorithm::iequals(GetFileExtension(GetFileName(path)).c_str(), extension.c_str());
 	}
 
-	const string CheckOneOfFileExtensions(const string path, const vector<string> extensions) {
+	const string CheckOneOfFileExtensions(const string path, const initializer_list<const string> extensions) {
 		for (const string extension : extensions) {
 			if (CheckFileExtension(path, extension)) {
 				return extension;
