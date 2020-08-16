@@ -10,18 +10,9 @@ namespace VHDTool {
 	const string DIRECTORY_SEPARATOR = string("\\");
 	const string EXTENSION_SEPARATOR = string(".");
 
-	const bool CheckFileExtension(const string path, const string extension) {
-		return boost::algorithm::iequals(GetFileExtension(GetFileName(path)).c_str(), extension.c_str());
-	}
-
-	const string CheckOneOfFileExtensions(const string path, const initializer_list<const string> extensions) {
-		for (const string extension : extensions) {
-			if (CheckFileExtension(path, extension)) {
-				return extension;
-			}
-		}
-
-		return string();
+	bool CheckFileExtension(const string path, const string extension) {
+		const string fileExtension = GetFileExtension(GetFileName(path));
+		return boost::algorithm::iequals(fileExtension, extension);
 	}
 
 	const string GetFileName(const string path) {

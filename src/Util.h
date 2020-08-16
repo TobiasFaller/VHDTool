@@ -6,8 +6,7 @@ namespace VHDTool {
 
 	void PrintError(const DWORD errorCode);
 
-	const bool CheckFileExtension(const std::string path, const std::string extension);
-	const std::string CheckOneOfFileExtensions(const std::string path, const std::initializer_list<const std::string> extensions);
+	bool CheckFileExtension(const std::string path, const std::string extension);
 	const std::string ConcatPath(const std::string path, const std::string file);
 	const std::string GetFileName(const std::string path);
 	const std::string GetFileExtension(const std::string path);

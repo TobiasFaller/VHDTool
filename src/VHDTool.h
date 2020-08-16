@@ -30,16 +30,16 @@ namespace VHDTool {
 		const std::string name;
 		const std::string description;
 		const Operation operation;
-		const std::initializer_list<const OptionName> options;
+		const std::initializer_list<const OptionName>& options;
 
 	public:
 		OperationName(const std::string name, const std::string description,
-			Operation operation, const std::initializer_list<const OptionName> options);
+			Operation operation, const std::initializer_list<const OptionName>& options);
 
 		const std::string getName(void) const;
 		const std::string getDescription(void) const;
 		Operation getOperationValue(void) const;
-		const std::initializer_list<const OptionName> getOptions(void) const;
+		const std::initializer_list<const OptionName>& getOptions(void) const;
 	};
 
 	class OptionName {
@@ -64,16 +64,16 @@ namespace VHDTool {
 	class FileOptions {
 	private:
 		bool readOnly;
-		std::string extension;
+		std::string type;
 
 	public:
 		FileOptions(void);
-		FileOptions(bool readOnly, const std::string extension);
+		FileOptions(bool readOnly, const std::string type);
 
 		bool isReadOnly() const;
 		void setReadOnly(bool readOnly);
-		const std::string getExtension() const;
-		void setExtension(const std::string extension);
+		const std::string getType() const;
+		void setType(const std::string type);
 	};
 
 	class ProgramOptions {
@@ -92,14 +92,15 @@ namespace VHDTool {
 		FileOptions& getFileOptions(void);
 	};
 
-	const std::initializer_list<const OperationName> getSupportedOperations(void);
-	const std::initializer_list<const std::string> getSupportedExtensions(void);
+	const std::initializer_list<const OperationName>& GetSupportedOperations(void);
 
 	// Constants
 
-	const std::string EXTENSION_UNDEFINED = "Undefined";
-	const std::string EXTENSION_VHD = "VHD";
-	const std::string EXTENSION_VHDX = "VHDX";
-	const std::string EXTENSION_ISO = "ISO";
+	const std::string FILETYPE_UNDEFINED = "Undefined";
+	const std::string FILETYPE_VHD = "VHD";
+	const std::string FILETYPE_VHDX = "VHDX";
+	const std::string FILETYPE_ISO = "ISO";
+
+	const std::string GetFileType(const std::string path);
 
 };

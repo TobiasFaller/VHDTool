@@ -21,7 +21,7 @@ namespace VHDTool {
 		cout << "Usage: " << fileName << " <operation> [options] <path> path path ..." << endl;
 		cout << endl;
 		cout << "Operations:" << endl;
-		for (const OperationName& operation : getSupportedOperations()) {
+		for (const OperationName& operation : GetSupportedOperations()) {
 			cout << "  " << operation.getName() << endl;
 			cout << "    " << operation.getDescription() << endl << endl;
 
@@ -44,7 +44,7 @@ namespace VHDTool {
 
 		const string opName = StripLeadingDashes(arguments[1]);
 		const OperationName* operation = nullptr;
-		for (const OperationName& operationName : getSupportedOperations()) {
+		for (const OperationName& operationName : GetSupportedOperations()) {
 			if (opName == operationName.getName()) {
 				operation = &operationName;
 				break;
@@ -141,12 +141,14 @@ namespace VHDTool {
 		storageType.VendorId = VIRTUAL_STORAGE_TYPE_VENDOR_MICROSOFT;
 		storageType.DeviceId = VIRTUAL_STORAGE_TYPE_DEVICE_VHD;
 
-		if (boost::iequals(arguments.getExtension(), EXTENSION_ISO)) {
+#ifdef VIRTUAL_STORAGE_TYPE_DEVICE_ISO
+		if (boost::iequals(arguments.getType(), FILETYPE_ISO)) {
 			storageType.DeviceId = VIRTUAL_STORAGE_TYPE_DEVICE_ISO;
 		}
+#endif
 
 #ifdef VIRTUAL_STORAGE_TYPE_DEVICE_VHDX
-		if (boost::iequals(arguments.getExtension(), EXTENSION_VHDX)) {
+		if (boost::iequals(arguments.getType(), FILETYPE_VHDX)) {
 			storageType.DeviceId = VIRTUAL_STORAGE_TYPE_DEVICE_VHDX;
 		}
 #endif
@@ -169,7 +171,7 @@ namespace VHDTool {
 		pathW.clear();
 
 		if (error) {
-			cout << "Could not open " << arguments.getExtension() << " file \"" << path << "\"" << endl;
+			cout << "Could not open " << arguments.getType() << " file \"" << path << "\"" << endl;
 			PrintError(error);
 			return;
 		}
@@ -183,21 +185,21 @@ namespace VHDTool {
 
 			error = AttachVirtualDisk(handle, NULL, (ATTACH_VIRTUAL_DISK_FLAG) attachFlags, 0, NULL, NULL);
 			if (error) {
-				cout << "Could not attach " << arguments.getExtension() << " file \"" << path << "\"" << endl;
+				cout << "Could not attach " << arguments.getType() << " file \"" << path << "\"" << endl;
 				PrintError(error);
 				return;
 			}
-			cout << arguments.getExtension() << " file \"" << path << "\" attached!" << endl;
+			cout << arguments.getType() << " file \"" << path << "\" attached!" << endl;
 			break;
 		}
 		case VHDTool::Operation::Dismount: {
 			error = DetachVirtualDisk(handle, DETACH_VIRTUAL_DISK_FLAG_NONE, 0);
 			if (error) {
-				cout << "Could not detach " << arguments.getExtension() << " file \"" << path << "\"" << endl;
+				cout << "Could not detach " << arguments.getType() << " file \"" << path << "\"" << endl;
 				PrintError(error);
 				return;
 			}
-			cout << arguments.getExtension() << " file \"" << path << "\" detached!" << endl;
+			cout << arguments.getType() << " file \"" << path << "\" detached!" << endl;
 			break;
 		}
 		default:
@@ -226,17 +228,16 @@ namespace VHDTool {
 			}
 
 			const string fileName = fromWChar(findData.cFileName);
-			const string extension = CheckOneOfFileExtensions(fileName, getSupportedExtensions());
-			if (!extension.empty() || arguments.getTryAllFiles()) {
+			const string fileType = GetFileType(fileName);
+			if (fileType != FILETYPE_UNDEFINED || arguments.getTryAllFiles()) {
 				const string newPath = ConcatPath(parentDirectory, fileName);
 				if (newPath.empty()) {
 					cout << "Path \"" << parentDirectory << "\" is too long to mount file \"" << fileName << "\"!" << endl;
 					continue;
 				}
 
-				// Create copy of file options
-				FileOptions fileOptions = arguments.getFileOptions();
-				fileOptions.setExtension(extension);
+				FileOptions fileOptions(arguments.getFileOptions());
+				fileOptions.setType(fileType);
 				DoActionOnSingleFile(newPath, operation, fileOptions);
 			}
 		} while (FindNextFileW(handleFind, &findData) != 0);
@@ -284,17 +285,16 @@ namespace VHDTool {
 				continue;
 			}
 
-			const string extension = CheckOneOfFileExtensions(fileName, getSupportedExtensions());
-			if (!extension.empty() || arguments.getTryAllFiles()) {
+			const string fileType = GetFileType(fileName);
+			if (fileType != FILETYPE_UNDEFINED || arguments.getTryAllFiles()) {
 				const string newPath = ConcatPath(path, fileName);
 				if (newPath.empty()) {
 					cout << "Path \"" << path << "\" is too long to mount file!";
 					continue;
 				}
 
-				// Create copy of file options
-				FileOptions fileOptions = arguments.getFileOptions();
-				fileOptions.setExtension(extension);
+				FileOptions fileOptions(arguments.getFileOptions());
+				fileOptions.setType(fileType);
 				DoActionOnSingleFile(newPath, operation, fileOptions);
 			}
 		} while (FindNextFileW(handleFind, &findData) != 0);

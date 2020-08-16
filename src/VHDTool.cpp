@@ -9,7 +9,7 @@ namespace VHDTool {
 
 	// OperationName
 	OperationName::OperationName(const string name, const string description, Operation operation,
-			const initializer_list<const OptionName> options):
+			const initializer_list<const OptionName>& options):
 		name(name),
 		description(description),
 		operation(operation),
@@ -25,7 +25,7 @@ namespace VHDTool {
 	Operation OperationName::getOperationValue(void) const {
 		return operation;
 	}
-	const initializer_list<const OptionName> OperationName::getOptions(void) const {
+	const initializer_list<const OptionName>& OperationName::getOptions(void) const {
 		return options;
 	}
 
@@ -60,12 +60,12 @@ namespace VHDTool {
 
 	FileOptions::FileOptions(void):
 		readOnly(true),
-		extension()
+		type(FILETYPE_UNDEFINED)
 	{}
 
-	FileOptions::FileOptions(const bool readOnly, const string extension):
+	FileOptions::FileOptions(const bool readOnly, const string type):
 		readOnly(readOnly),
-		extension(extension)
+		type(type)
 	{}
 
 	bool FileOptions::isReadOnly(void) const {
@@ -74,15 +74,11 @@ namespace VHDTool {
 	void FileOptions::setReadOnly(bool readOnly) {
 		this->readOnly = readOnly;
 	}
-	const string FileOptions::getExtension(void) const {
-		return extension;
+	const string FileOptions::getType(void) const {
+		return type;
 	}
-	void FileOptions::setExtension(const string extension) {
-		if (!extension.empty()) {
-			this->extension = extension;
-		} else {
-			this->extension = EXTENSION_UNDEFINED;
-		}
+	void FileOptions::setType(const string type) {
+		this->type = type;
 	}
 
 	// ProgramOptions
@@ -161,19 +157,25 @@ namespace VHDTool {
 		OPERATION_MOUNT,
 		OPERATION_DISMOUNT
 	};
-	const initializer_list<const OperationName> getSupportedOperations(void) {
+	const initializer_list<const OperationName>& GetSupportedOperations(void) {
 		return OPERATIONS;
 	}
 
-	// Supported extensions
+	// Supported types
 
-	const initializer_list<const string> EXTENSIONS = {
-		EXTENSION_VHD,
-		EXTENSION_VHDX,
-		EXTENSION_ISO
+	const initializer_list<const string> FILETYPES = {
+		FILETYPE_VHD,
+		FILETYPE_VHDX,
+		FILETYPE_ISO
 	};
-	const std::initializer_list<const std::string> getSupportedExtensions(void) {
-		return EXTENSIONS;
+	const string GetFileType(const string path) {
+		for (const string extension : FILETYPES) {
+			if (CheckFileExtension(path, extension)) {
+				return extension;
+			}
+		}
+
+		return FILETYPE_UNDEFINED;
 	}
 
 };
