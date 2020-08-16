@@ -29,13 +29,13 @@ Operations:
     -D: Mounts all images in the directory specified by the path
         and all subdirectories
     -a: Tries to mount all files even if they have not the correct
-        file extension
+        file extension (only applies to -d and -D)
   unmount: Unmounts one or more VHD or VHDX files specified by path
     -d: Unmounts all images in the directory specified by the path
     -D: Unmounts all images in the directory specified by the path
         and all subdirectories
     -a: Tries to unmount all files even if they have not the correct
-        file extension
+        file extension (only applies to -d and -D)
 ```
 
 Here are some examples how to use this tool:
