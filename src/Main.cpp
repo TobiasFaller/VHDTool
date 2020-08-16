@@ -7,92 +7,90 @@ using namespace std;
 
 namespace VHDTool {
 
-	int main(size_t argc, const vector<string> argv);
+	int Run(vector<string> arguments);
 	void PrintUsage(const string path);
 
-	void DoActionOnSingleFile(const string path, const size_t operation, const FileOptions arguments);
-	void DoActionOnDirectory(const string path, const size_t operation, const ProgramOptions arguments);
-	void DoActionOnFiles(const string path, const size_t operation, const ProgramOptions arguments);
-
-	//locale locale::locale() = boost::locale::generator().generate("");
+	void DoActionOnSingleFile(const string path, Operation operation, FileOptions arguments);
+	void DoActionOnDirectory(const string path, Operation operation, ProgramOptions arguments);
+	void DoActionOnFiles(const string path, Operation operation, ProgramOptions arguments);
 
 	void PrintUsage(const string programmName) {
-		const string fileName = GetFileName(move(programmName));
+		const string fileName = GetFileName(programmName);
 
 		cout << "Usage: " << fileName << " <operation> [options] <path> path path ..." << endl;
 		cout << endl;
 		cout << "Operations:" << endl;
-		for (OperationName operation : OPERATION_NAMES) {
+		for (const OperationName& operation : OPERATION_NAMES) {
 			cout << "  " << operation.getName() << endl;
 			cout << "    " << operation.getDescription() << endl << endl;
 
-			for (OptionName option : operation) {
+			for (const OptionName& option : operation.getOptions()) {
 				cout << "    --" << option.getName() << "(-" << option.getShortForm() << ")" << endl;
 				cout << "      " << option.getDescription() << endl << endl;
 			}
 		}
 	}
 
-	int main(size_t argc, const vector<string> argv)
+	int Run(vector<string> arguments)
 	{
 		cout << "VHDTool v1.0" << endl;
 		cout << endl;
 
-		if (argc < 2) {
-			PrintUsage(move(argv[0]));
+		if (arguments.size() < 2) {
+			PrintUsage(move(arguments[0]));
 			return 1;
 		}
 
-		const string opName = move(argv[1].substr((argv[1].find("--") == 0)
-			? 2 : ((argv[1].find("-") == 0) ? 1 : 0)));
+		const string opName = arguments[1].substr((arguments[1].find("--") == 0)
+			? 2 : ((arguments[1].find("-") == 0) ? 1 : 0));
 
-		OperationName operation = OperationName();
-		for (OperationName operationName : OPERATION_NAMES) {
-			if (opName.compare(operationName.getName().c_str()) == 0) {
-				operation = operationName; // copy
+		const OperationName* operation = nullptr;
+		for (const OperationName& operationName : OPERATION_NAMES) {
+			if (opName == operationName.getName()) {
+				operation = &operationName;
 				break;
 			}
 		}
 
-		if (!operation.isValid()) {
+		if (operation == nullptr) {
 			cout << "Unknown operation \"" << opName << "\"!" << endl << endl;
-			PrintUsage(argv[0]);
+			PrintUsage(arguments[0]);
 			return 1;
 		}
 
-		size_t options = Option::None;
+		size_t options = (size_t) Option::None;
 		size_t argument = 2;
-		for (; argument + 1 < argc; argument++){
+		for (; argument + 1 < arguments.size(); argument++){
 			string argumentValue;
 			bool shortArg = false;
 
-			if (argv[argument].find("--") == 0) {
-				argumentValue = move(argv[argument].substr(2));
+			if (arguments[argument].find("--") == 0) {
+				argumentValue = arguments[argument].substr(2);
 			}
-			else if (argv[argument].find("-") == 0){
+			else if (arguments[argument].find("-") == 0){
 				shortArg = true;
-				argumentValue = move(argv[argument].substr(1));
+				argumentValue = arguments[argument].substr(1);
 			}
 			else {
 				break; // Interpret as Path
 			}
 
 			bool validArg = false;
-			for (OptionName optionName : operation) {
+			for (const OptionName& optionName : operation->getOptions()) {
 				const string optionNameText = shortArg ? optionName.getShortForm() : optionName.getName();
 
 				if (optionName.isCaseSensitive()
-					? boost::equals(argumentValue.c_str(), optionNameText.c_str())
-					: boost::iequals(argumentValue.c_str(), optionNameText.c_str())) {
+					? boost::equals(argumentValue, optionNameText)
+					: boost::iequals(argumentValue, optionNameText)) {
 
-					if ((options & optionName.getOptionValue()) != 0) {
+					if ((options & (size_t) optionName.getOptionValue()) != 0) {
 						cout << "Option \"" << argumentValue << "\" already specified! Ignoring second one!"
 							<< endl;
 						break;
 					}
 
 					validArg = true;
-					options |= optionName.getOptionValue();
+					options |= (size_t) optionName.getOptionValue();
 					break;
 				}
 			}
@@ -100,58 +98,53 @@ namespace VHDTool {
 			if (!validArg) {
 				cout << "Unknown option \"" << argumentValue << "\"!" << endl;
 				cout << endl;
-				PrintUsage(move(argv[0]));
+				PrintUsage(arguments[0]);
 				return 1;
 			}
 		}
 
-		if (operation.getOperationValue() == Operation::Help) {
-			PrintUsage(move(argv[0]));
+		if (operation->getOperationValue() == Operation::Help) {
+			PrintUsage(arguments[0]);
 			return 0;
 		}
 
-		if (argc - argument <= 0) {
+		if (arguments.size() - argument <= 0) {
 			cout << "No path/file specified!" << endl;
 			cout << endl;
-			PrintUsage(move(argv[0]));
+			PrintUsage(arguments[0]);
 			return 1;
 		}
 
-		ProgramOptions programOptions = ProgramOptions();
+		ProgramOptions programOptions;
+		programOptions.getFileOptions().setReadOnly((options & (size_t) Option::ReadOnly) != 0);
+		programOptions.setTryAllFiles((options & (size_t) Option::TryAll) != 0);
+		programOptions.setRecursive((options & (size_t) Option::DirectoryRecursive) != 0);
 
-		if ((options & Option::ReadOnly) != 0) {
-			programOptions.getFileOptions()->setReadOnly(true);
-		}
-
-		programOptions.setTryAllFiles((options & Option::TryAll) != 0);
-		programOptions.setRecursive((options & Option::DirectoryRecursive) != 0);
-
-		const bool paramIsDirectory = ((options & (Option::Directory | Option::DirectoryRecursive)) != 0);
-		void(*function)(const string, const size_t, ProgramOptions)
+		const bool paramIsDirectory = ((options & ((size_t) Option::Directory | (size_t) Option::DirectoryRecursive)) != 0);
+		void(*function)(const string, Operation, ProgramOptions)
 			= (paramIsDirectory ? &DoActionOnDirectory : &DoActionOnFiles);
 
-		for (; argument < argc; argument++) {
-			cout << "Mounting " << argv[argument] << " as " << (paramIsDirectory ? "directory" : "file/s") << "!" << endl;
+		for (; argument < arguments.size(); argument++) {
+			cout << "Mounting " << arguments[argument] << " as " << (paramIsDirectory ? "directory" : "file/s") << "!" << endl;
 
-			function(argv[argument], operation.getOperationValue(), programOptions);
+			function(arguments[argument], operation->getOperationValue(), programOptions);
 		}
 
 		return 0;
 	}
 
-	void DoActionOnSingleFile(const string path, const size_t operation, FileOptions arguments) {
+	void DoActionOnSingleFile(const string path, Operation operation, FileOptions arguments) {
 		VIRTUAL_STORAGE_TYPE storageType;
 		HANDLE handle;
 		DWORD error;
 		VIRTUAL_DISK_ACCESS_MASK diskAccessMask;
-
 
 		if (arguments.getExtension().empty()) {
 			arguments.setExtension(CheckOneOfFileExtensions(path, EXTENSIONS));
 		}
 
 #if _WIN32_WINNT > _WIN32_WINNT_WIN8
-		bool isVhdx = (boost::iequals(arguments.getExtension().c_str(), EXTENSION_VHDX.c_str()));
+		bool isVhdx = boost::iequals(arguments.getExtension(), EXTENSION_VHDX);
 #endif
 		const string readableExtension = (!arguments.getExtension().empty() ? arguments.getExtension() : EXTENSION_UNDEFINED);
 
@@ -163,10 +156,10 @@ namespace VHDTool {
 #endif
 
 		switch (operation) {
-		case VHDTool::Mount:
+		case VHDTool::Operation::Mount:
 			diskAccessMask = arguments.isReadOnly() ? VIRTUAL_DISK_ACCESS_ATTACH_RO : VIRTUAL_DISK_ACCESS_ATTACH_RW;
 			break;
-		case VHDTool::Dismount:
+		case VHDTool::Operation::Dismount:
 			diskAccessMask = VIRTUAL_DISK_ACCESS_DETACH;
 			break;
 		default:
@@ -186,7 +179,7 @@ namespace VHDTool {
 		}
 
 		switch (operation) {
-		case VHDTool::Mount:
+		case VHDTool::Operation::Mount:
 			error = AttachVirtualDisk(handle, NULL,
 				(ATTACH_VIRTUAL_DISK_FLAG)(ATTACH_VIRTUAL_DISK_FLAG_PERMANENT_LIFETIME
 					| (arguments.isReadOnly() ? ATTACH_VIRTUAL_DISK_FLAG_READ_ONLY : ATTACH_VIRTUAL_DISK_FLAG_NONE)),
@@ -198,7 +191,7 @@ namespace VHDTool {
 			}
 			cout << readableExtension << " file \"" << path << "\" attached!" << endl;
 			break;
-		case VHDTool::Dismount:
+		case VHDTool::Operation::Dismount:
 			error = DetachVirtualDisk(handle, DETACH_VIRTUAL_DISK_FLAG_NONE, 0);
 			if (error) {
 				cout << "Could not detach " << readableExtension << " file \"" << path << "\"" << endl;
@@ -213,7 +206,7 @@ namespace VHDTool {
 		}
 	}
 
-	void DoActionOnFiles(const string path, const size_t operation, ProgramOptions arguments) {
+	void DoActionOnFiles(const string path, Operation operation, ProgramOptions arguments) {
 		HANDLE handleFind;
 		WIN32_FIND_DATAW findData;
 
@@ -235,7 +228,7 @@ namespace VHDTool {
 
 			const string fileName = fromWChar(findData.cFileName);
 			const string extension = CheckOneOfFileExtensions(fileName, EXTENSIONS);
-			if (extension.empty() || arguments.getTryAllFiles()) {
+			if (!extension.empty() || arguments.getTryAllFiles()) {
 				const string newPath = ConcatPath(parentDirectory, fileName);
 				if (newPath.empty()) {
 					cout << "Path \"" << parentDirectory << "\" is too long to mount file \"" << fileName
@@ -243,9 +236,9 @@ namespace VHDTool {
 					continue;
 				}
 
-				FileOptions fileOptions = *(arguments.getFileOptions());
+				// Create copy of file options
+				FileOptions fileOptions = arguments.getFileOptions();
 				fileOptions.setExtension(extension);
-
 				DoActionOnSingleFile(newPath, operation, fileOptions);
 			}
 		} while (FindNextFileW(handleFind, &findData) != 0);
@@ -253,7 +246,7 @@ namespace VHDTool {
 		FindClose(handleFind);
 	}
 
-	void DoActionOnDirectory(const string path, const size_t operation, ProgramOptions arguments) {
+	void DoActionOnDirectory(const string path, Operation operation, ProgramOptions arguments) {
 		HANDLE handleFind;
 		WIN32_FIND_DATAW findData;
 
@@ -302,16 +295,16 @@ namespace VHDTool {
 					continue;
 				}
 
-				FileOptions fileOptions = *(arguments.getFileOptions());
+				// Create copy of file options
+				FileOptions fileOptions = arguments.getFileOptions();
 				fileOptions.setExtension(extension);
-
 				DoActionOnSingleFile(newPath, operation, fileOptions);
 			}
 		} while (FindNextFileW(handleFind, &findData) != 0);
 
 		FindClose(handleFind);
 	}
-}
+};
 
 int main(const int argc, const char* argv[]) {
 	vector<string> parsedParams = vector<string>();
@@ -320,5 +313,5 @@ int main(const int argc, const char* argv[]) {
 		parsedParams.push_back(string(argv[arg]));
 	}
 
-	return VHDTool::main(argc, move(parsedParams));
+	return VHDTool::Run(parsedParams);
 }

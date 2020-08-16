@@ -8,119 +8,100 @@ using namespace std;
 namespace VHDTool {
 
 	// OperationName
+	OperationName::OperationName(const string name, const string description, Operation operation,
+			const initializer_list<OptionName> options):
+		name(name),
+		description(description),
+		operation(operation),
+		options(options)
+	{}
 
-	OperationName::OperationName() : name(), description(), operation(), options(), valid(false) {}
-	OperationName::OperationName(const char* name, const char* description, const Operation operation,
-		const vector<OptionName> options) : name(name), description(description), operation(operation),
-		options(options), valid(true) {}
-
-	OperationName& OperationName::operator= (const OperationName& other) {
-		if (this != &other) {
-			valid = other.valid;
-			name = other.name;
-			description = other.description;
-			operation = other.operation;
-			options = other.options;
-		}
-
-		return *this;
-	}
-
-	const bool OperationName::isValid() {
-		return valid;
-	}
-	const string OperationName::getName() {
+	const string OperationName::getName(void) const {
 		return name;
 	}
-	const string OperationName::getDescription() {
+	const string OperationName::getDescription(void) const {
 		return description;
 	}
-	const Operation OperationName::getOperationValue() {
+	Operation OperationName::getOperationValue(void) const {
 		return operation;
 	}
-	const vector<OptionName>::const_iterator OperationName::begin() {
-		return options.cbegin();
-	}
-	const vector<OptionName>::const_iterator OperationName::end() {
-		return options.cend();
+	const vector<OptionName>& OperationName::getOptions(void) const {
+		return options;
 	}
 
 	// OptionName
 
-	OptionName::OptionName() : name(), shortForm(), description(), option(), caseSensitive(), valid(false) {}
-	OptionName::OptionName(const char* name, const char* shortForm, const char* description,
-		const Option option, const bool caseSensitive) : name(name), shortForm(shortForm),
-		description(description), option(option), caseSensitive(caseSensitive), valid(true) {}
+	OptionName::OptionName(const string name, const string shortForm, const string description,
+			Option option, bool caseSensitive):
+		name(name),
+		shortForm(shortForm),
+		description(description),
+		option(option),
+		caseSensitive(caseSensitive)
+	{}
 
-	OptionName& OptionName::operator= (const OptionName& other) {
-		if (this != &other) {
-			valid = other.valid;
-			name = other.name;
-			shortForm = other.shortForm;
-			description = other.description;
-			option = other.option;
-			caseSensitive = other.caseSensitive;
-		}
-
-		return *this;
-	}
-
-	const bool OptionName::isValid() {
-		return valid;
-	}
-	const string OptionName::getName() {
+	const string OptionName::getName(void) const {
 		return name;
 	}
-	const string OptionName::getShortForm() {
+	const string OptionName::getShortForm(void) const {
 		return shortForm;
 	}
-	const string OptionName::getDescription() {
+	const string OptionName::getDescription(void) const {
 		return description;
 	}
-	const Option OptionName::getOptionValue() {
+	Option OptionName::getOptionValue(void) const {
 		return option;
 	}
-	const bool OptionName::isCaseSensitive() {
+	bool OptionName::isCaseSensitive(void) const {
 		return caseSensitive;
 	}
 
 	// FileOptions
 
-	FileOptions::FileOptions() : readOnly(true), extension() {}
-	FileOptions::FileOptions(const bool readOnly, const string extension) : readOnly(readOnly), extension(extension) {}
+	FileOptions::FileOptions(void):
+		readOnly(true),
+		extension()
+	{}
 
-	const bool FileOptions::isReadOnly() {
+	FileOptions::FileOptions(const bool readOnly, const string extension):
+		readOnly(readOnly),
+		extension(extension)
+	{}
+
+	bool FileOptions::isReadOnly(void) const {
 		return readOnly;
 	}
-	void FileOptions::setReadOnly(const bool readOnly) {
+	void FileOptions::setReadOnly(bool readOnly) {
 		this->readOnly = readOnly;
 	}
-	const string FileOptions::getExtension() {
+	const string FileOptions::getExtension(void) const {
 		return extension;
 	}
-	const void FileOptions::setExtension(const string extension) {
+	void FileOptions::setExtension(const string extension) {
 		this->extension = extension;
 	}
 
 	// ProgramOptions
 
-	ProgramOptions::ProgramOptions() : fileOptions(), recursive(false), tryAllFiles(false) {}
-	ProgramOptions::ProgramOptions(FileOptions fileOptions, const bool recursive, const bool tryAllFiles)
-		: fileOptions(fileOptions), recursive(recursive), tryAllFiles(tryAllFiles) {}
+	ProgramOptions::ProgramOptions():
+		fileOptions(),
+		recursive(false),
+		tryAllFiles(false)
+	{}
 
 	void ProgramOptions::setRecursive(const bool recursive) {
 		this->recursive = recursive;
 	}
-	const bool ProgramOptions::getRecursive() {
+	bool ProgramOptions::getRecursive(void) const {
 		return recursive;
 	}
 	void ProgramOptions::setTryAllFiles(const bool tryAllFiles) {
 		this->tryAllFiles = tryAllFiles;
 	}
-	const bool ProgramOptions::getTryAllFiles() {
+	bool ProgramOptions::getTryAllFiles(void) const {
 		return tryAllFiles;
 	}
-	FileOptions* ProgramOptions::getFileOptions() {
-		return &(this->fileOptions);
+	FileOptions& ProgramOptions::getFileOptions() {
+		return fileOptions;
 	}
-}
+};

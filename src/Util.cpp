@@ -84,8 +84,9 @@ namespace VHDTool {
 		const wchar_t* textData = text.c_str();
 		mbstate_t mbstate = mbstate_t();
 
+		// Get size of resulting string
 		size_t retVal = wcsrtombs(nullptr, &textData, 0, &mbstate);
-		if (retVal == -1) {
+		if (retVal == static_cast<std::size_t>(-1)) {
 			cout << "Error: Could not convert error into current codepage!" << endl;
 			return string();
 		}
@@ -96,41 +97,44 @@ namespace VHDTool {
 			return string();
 		}
 
+		// Do conversion
 		retVal = wcsrtombs(message, &textData, (retVal + 1), &mbstate);
-		if (retVal == -1) {
+		if (retVal == static_cast<std::size_t>(-1)) {
 			cout << "Error: Could not convert error into current codepage!" << endl;
 			return string();
 		}
 
 		string finalText = string(message);
 		free(message);
-		return move(finalText);
+		return finalText;
 	}
 
 	const wstring toWChar(const string text) {
 		const char* textData = text.c_str();
 		mbstate_t mbstate = mbstate_t();
 
+		// Get size of resulting string
 		size_t retVal = mbsrtowcs(nullptr, &textData, 0, &mbstate);
-		if (retVal == -1) {
+		if (retVal == static_cast<std::size_t>(-1)) {
 			cout << "Error: Could not convert error into current codepage!" << endl;
 			return wstring();
 		}
 
-		wchar_t* message = (wchar_t*)malloc(sizeof(wchar_t) * (retVal + 1));
+		wchar_t* message = (wchar_t*) malloc(sizeof(wchar_t) * (retVal + 1));
 		if (message == nullptr) {
 			cout << "Error: Could not allocate space for error-message!" << endl;
 			return wstring();
 		}
 
+		// Do conversion
 		retVal = mbsrtowcs(message, &textData, (retVal + 1), &mbstate);
-		if (retVal == -1) {
+		if (retVal == static_cast<std::size_t>(-1)) {
 			cout << "Error: Could not convert error into current codepage!" << endl;
 			return wstring();
 		}
 
 		wstring finalText = wstring(message);
 		free(message);
-		return move(finalText);
+		return finalText;
 	}
-}
+};

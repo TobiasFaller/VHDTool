@@ -1,18 +1,19 @@
 #pragma once
 
-using namespace std;
+#include "stdafx.h"
 
 namespace VHDTool {
 
 	void PrintError(const DWORD errorCode);
 
-	const bool CheckFileExtension(const string path, const string extension);
-	const string CheckOneOfFileExtensions(const string path, const vector<string> extensions);
-	const string ConcatPath(const string path, const string file);
-	const string GetFileName(const string path);
-	const string GetFileExtension(const string path);
-	const string GetFilePath(const string path);
+	const bool CheckFileExtension(const std::string path, const std::string extension);
+	const std::string CheckOneOfFileExtensions(const std::string path, const std::vector<std::string> extensions);
+	const std::string ConcatPath(const std::string path, const std::string file);
+	const std::string GetFileName(const std::string path);
+	const std::string GetFileExtension(const std::string path);
+	const std::string GetFilePath(const std::string path);
 
-	const wstring toWChar(const string text);
-	const string fromWChar(const wstring text);
-}
+	const std::wstring toWChar(const std::string text);
+	const std::string fromWChar(const std::wstring text);
+
+};

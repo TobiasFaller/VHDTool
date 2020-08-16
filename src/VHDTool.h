@@ -1,120 +1,108 @@
 #pragma once
 
-using namespace std;
+#include "stdafx.h"
 
 namespace VHDTool {
 
 	// Enums
 
-	enum Option {
+	enum class Option: size_t {
 		None = 0x00,
 		TryAll = (1 << 0x01),
 		ReadOnly = (1 << 0x02),
 		Directory = (1 << 0x03),
 		DirectoryRecursive = (1 << 0x04)
 	};
-	enum Operation {
+	enum class Operation: size_t {
 		Mount,
 		Dismount,
-		Help,
-		InvalidArg,
-		InvalidOperation
+		Help
 	};
 
 	// Classes
 
+	class OperationName;
+	class OptionName;
+	class FileOptions;
+	class ProgramOptions;
+
+	class OperationName {
+		const std::string name;
+		const std::string description;
+		const Operation operation;
+		const std::vector<OptionName> options;
+
+	public:
+		OperationName(const std::string name, const std::string description,
+			Operation operation, const std::initializer_list<OptionName> options);
+
+		const std::string getName(void) const;
+		const std::string getDescription(void) const;
+		Operation getOperationValue(void) const;
+		const std::vector<OptionName>& getOptions(void) const;
+	};
+
+	class OptionName {
+	private:
+		std::string name;
+		std::string shortForm;
+		std::string description;
+		Option option;
+		bool caseSensitive;
+
+	public:
+		OptionName(const std::string name, const std::string shortForm,
+			const std::string description, Option option, bool caseSensitive);
+
+		const std::string getName(void) const;
+		const std::string getShortForm(void) const;
+		const std::string getDescription(void) const;
+		Option getOptionValue(void) const;
+		bool isCaseSensitive(void) const;
+	};
+
 	class FileOptions {
 	private:
 		bool readOnly;
-		string extension;
+		std::string extension;
 
 	public:
-		FileOptions();
-		FileOptions(bool readOnly, const string extension);
+		FileOptions(void);
+		FileOptions(bool readOnly, const std::string extension);
 
-		const bool isReadOnly();
-		void setReadOnly(const bool readOnly);
-		const string getExtension();
-		const void setExtension(const string extension);
+		bool isReadOnly() const;
+		void setReadOnly(bool readOnly);
+		const std::string getExtension() const;
+		void setExtension(const std::string extension);
 	};
 
 	class ProgramOptions {
 	private:
 		FileOptions fileOptions;
-
 		bool recursive;
 		bool tryAllFiles;
 
 	public:
-		ProgramOptions();
-		ProgramOptions(FileOptions fileOptions, const bool recursive, const bool tryAllFiles);
+		ProgramOptions(void);
 
 		void setRecursive(const bool recursive);
-		const bool getRecursive();
+		bool getRecursive(void) const;
 		void setTryAllFiles(const bool tryAllFiles);
-		const bool getTryAllFiles();
-
-		FileOptions* getFileOptions();
-	};
-
-	class OptionName {
-	private:
-		bool valid;
-		string name;
-		string shortForm;
-		string description;
-		Option option;
-		bool caseSensitive;
-
-	public:
-		OptionName();
-		OptionName(const char* name, const char* shortForm,
-			const char* description, Option option,
-			const bool caseSensitive);
-
-		OptionName& operator= (const OptionName& other);
-
-		const bool isValid();
-		const string getName();
-		const string getShortForm();
-		const string getDescription();
-		const Option getOptionValue();
-		const bool isCaseSensitive();
-	};
-
-	class OperationName {
-		bool valid;
-		string name;
-		string description;
-		Operation operation;
-		vector<OptionName> options;
-
-	public:
-		OperationName();
-		OperationName(const char* name, const char* description,
-			Operation operation, const vector<OptionName> options);
-
-		OperationName& operator= (const OperationName& other);
-
-		const bool isValid();
-		const string getName();
-		const string getDescription();
-		const Operation getOperationValue();
-		const vector<OptionName>::const_iterator begin();
-		const vector<OptionName>::const_iterator end();
+		bool getTryAllFiles(void) const;
+		FileOptions& getFileOptions(void);
 	};
 
 	// Constants
 
-	const string EXTENSION_UNDEFINED = string("Undefined");
-	const string EXTENSION_VHD = string("VHD");
-	const string EXTENSION_VHDX = string("VHDX");
-	const vector<string> EXTENSIONS = {EXTENSION_VHD, EXTENSION_VHDX};
+	const std::string EXTENSION_UNDEFINED = std::string("Undefined");
+	const std::string EXTENSION_VHD = std::string("VHD");
+	const std::string EXTENSION_VHDX = std::string("VHDX");
+	const std::vector<std::string> EXTENSIONS = {EXTENSION_VHD, EXTENSION_VHDX};
 
-	const string SEARCH_APPEND = string("*");
+	const std::string SEARCH_APPEND = std::string("*");
 
-	const string DIRECTORY_SAME = string(".");
-	const string DIRECTORY_PARENT = string("..");
+	const std::string DIRECTORY_SAME = std::string(".");
+	const std::string DIRECTORY_PARENT = std::string("..");
 
 	const OptionName OPTION_TRYALL = OptionName(
 		"all", "a", "Mount also files with other extension than \"vhd\" or \"vhdx\"",
@@ -133,35 +121,34 @@ namespace VHDTool {
 		Option::DirectoryRecursive, true
 	);
 
-	const vector<OptionName> MOUNT_OPTIONS = {
-		OPTION_DIRECTORY,
-		OPTION_DIRECTORY_RECURSIVE,
-		OPTION_TRYALL,
-		OPTION_READONLY
-	};
-
-	const vector<OptionName> DISMOUNT_OPTIONS = {
-		OPTION_DIRECTORY,
-		OPTION_DIRECTORY_RECURSIVE,
-		OPTION_TRYALL
-	};
-
 	const OperationName OPERATION_HELP = OperationName(
 		"help", "Prints this help text",
-		Operation::Help, vector<OptionName>()
+		Operation::Help,
+		{}
 	);
 	const OperationName OPERATION_MOUNT = OperationName(
 		"mount", "Mounts a specified file / files in a directory",
-		Operation::Mount, MOUNT_OPTIONS
+		Operation::Mount,
+		{
+			OPTION_DIRECTORY,
+			OPTION_DIRECTORY_RECURSIVE,
+			OPTION_TRYALL,
+			OPTION_READONLY
+		}
 	);
 	const OperationName OPERATION_DISMOUNT = OperationName(
 		"unmount", "Dismounts a specified file / files in a directory",
-		Operation::Dismount, DISMOUNT_OPTIONS
+		Operation::Dismount,
+		{
+			OPTION_DIRECTORY,
+			OPTION_DIRECTORY_RECURSIVE,
+			OPTION_TRYALL
+		}
 	);
 
-	const vector<OperationName> OPERATION_NAMES = {
+	const std::initializer_list<OperationName> OPERATION_NAMES = {
 		OPERATION_HELP,
 		OPERATION_MOUNT,
 		OPERATION_DISMOUNT
 	};
-}
+};
