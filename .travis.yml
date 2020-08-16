@@ -3,10 +3,8 @@ language: cpp
 jobs:
   include:
   - os: windows
-    env:
-    - MINGW64_PATH="/C/tools/msys64/mingw64/bin"
     script:
-    - $msys2 export PATH="$MINGW64_PATH:$PATH" && mingw32-make all
+    - $mingw64 mingw32-make all
 
 before_install:
 - |-
